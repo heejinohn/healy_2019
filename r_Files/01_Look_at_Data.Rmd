@@ -1,0 +1,14 @@
+# **Chapter 1** Look at Data
+## Three categories of **badness**: elements of bad visualization
+* *Aesthetic*  
+  Tasteless graphs or those with non-informative decorations  
+
+* *Substantive*  
+  Misleading visualization  
+  
+* *Perceptual*  
+  Perception affects how readers interpret graphs–line, shapes, colors  
+    * Shape searching degrades much faster than color searching  
+    * Human tend to associate "randomness" with even distribution but the truth is that random processes are more clumpy (Poisson vs. Matérn)  
+    * *Gestalt rules*: Human infer relationships between objects in ways that goes beyond what is strictly visible. 
+
