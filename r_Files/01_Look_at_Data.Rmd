@@ -1,5 +1,5 @@
-# **Chapter 1** Look at Data
-## Three categories of **badness**: elements of bad visualization
+# Chapter 1 Look at Data  
+## Three categories of *badness*: elements of bad visualization
 * *Aesthetic*  
   Tasteless graphs or those with non-informative decorations  
 

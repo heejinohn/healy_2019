@@ -1,0 +1,66 @@
+# Chapter 3 Make a Plot  
+## Load libraries  
+```{r}
+library(tidyverse)
+library(gapminder) #data package
+library(here)
+# gapminder is already in a tidy data format. If not, we need to render the data into a tidy (i.e., long) format.
+```
+
+## Build ggplot() piece by piece  
+```{r example, fig.width = 12, fig.height = 5}
+# Step 1 Feed Data: Let ggplot know which data
+p  <- ggplot(data = gapminder)
+
+# Step 2 Specify Relationship: Mapping to graph elements uses function aes()
+p  <- ggplot(data = gapminder, mapping = aes(x = gdpPercap, y = lifeExp))
+   
+# Step 3 Set Appearance:  Add layer to the plot by picking the geom_ function
+p + geom_point()
+
+# Step 4 Add  Geom Layers: Adding geom_ functions let ggplot know how to visualize 
+p + geom_smooth()
+    ## `geom_smooth()` using method = 'gam' and formula 'y ~ s(x, bs = "cs")' 
+p + geom_point() + geom_smooth() 
+p + geom_point() + geom_smooth(method = "lm") # specify a linear model for fitting
+p + geom_point() + geom_smooth(method = "gam") + scale_x_log10() 
+
+# Step 5 Tinker Elements: Use additional functions for minute adjustments
+p + geom_point() + 
+    geom_smooth(method = "gam") +
+    scale_x_log10(labels = scales::dollar) 
+
+p  <- ggplot(data = gapminder, mapping = aes(x = gdpPercap, y = lifeExp)) 
+
+    ## an example of aesthetic without any meaning
+p + geom_point(color = "purple") + # aes should always be used to map data to elements
+    geom_smooth(method = "loess") +
+    scale_x_log10() 
+
+    ## Use each elements in geom_ to adjust elements in the graph
+p_labeled  <- p + geom_point(alpha = 0.3) + 
+    geom_smooth(method = "gam") +
+    scale_x_log10(labels = scales::dollar) +
+    labs(x = "GDP Per Capita", y = "Life Expectancy in Years",
+         title = "Economic Growth and Life Expectancy",
+         subtitle = "Data points are country-years", caption = "Source: Gapminder.")
+
+ggsave("figures/Ch02_lifexp_vs_gdp.pdf", plot = p_labeled, width = 12, height = 9) # Saving your figure in a separate file
+
+    ## color can be used to indicate continents
+p  <- ggplot(data = gapminder, mapping = aes(x = gdpPercap, y = lifeExp, color = continent, fill = continent)) 
+p + geom_point() + 
+    geom_smooth(method = "loess") +
+    scale_x_log10() 
+
+p  <- ggplot(data = gapminder, mapping = aes(x = gdpPercap, y = lifeExp)) 
+p + geom_point(mapping = aes(color = continent)) + 
+    geom_smooth(method = "loess") +
+    scale_x_log10() 
+    
+    ## mapping of continuous varialbes
+p + geom_point(mapping = aes(color = log(pop))) + 
+    scale_x_log10() 
+
+```
+
