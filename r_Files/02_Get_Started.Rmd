@@ -1,0 +1,14 @@
+# **Chapter 2** Get Started  
+## Check initial set-up
+```{r}
+library(tidyverse)
+library(socviz)
+    
+# first figure
+library(gapminder)
+gapminder
+p  <- ggplot(data=gapminder, mapping=aes(x=gdpPercap, y=lifeExp))
+p + geom_point()
+```
+
+
