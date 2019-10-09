@@ -7,7 +7,7 @@ library(here)
 # gapminder is already in a tidy data format. If not, we need to render the data into a tidy (i.e., long) format.
 ```
 
-## Build ggplot() piece by piece  
+## Build ggplot() piece-by-piece  
 ```{r example, fig.width = 12, fig.height = 5}
 # Step 1 Feed Data: Let ggplot know which data
 p  <- ggplot(data = gapminder)
@@ -33,7 +33,7 @@ p + geom_point() +
 p  <- ggplot(data = gapminder, mapping = aes(x = gdpPercap, y = lifeExp)) 
 
     ## an example of aesthetic without any meaning
-p + geom_point(color = "purple") + # aes should always be used to map data to elements
+p + geom_point(color = "purple") + # aes fuction should only be used to map data to geometrical objects
     geom_smooth(method = "loess") +
     scale_x_log10() 
 
