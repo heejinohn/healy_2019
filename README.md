@@ -1,6 +1,6 @@
-# Self-Study of *Data Visualization (2019)* by Kieran Healy  
+# *Data Visualization (2019)* by Kieran Healy  
 This repository contains practice files that I generated while following the
-book by my idol, Kieran Healy. It mostly contains exercises in *R* along with 
-auxilary files produced while reading.
+book written by Kieran Healy at Duke. It contains exercises in *R* along with 
+notes taken while reading the book.
 
-## 
+The main purpose of this repository is taking notes for myself. So the `.Rmd` files in the `r_Files` folder may be too obscure to follow without the book.
