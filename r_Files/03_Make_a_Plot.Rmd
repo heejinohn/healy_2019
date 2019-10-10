@@ -3,7 +3,6 @@
 ```{r}
 library(tidyverse)
 library(gapminder) #data package
-library(here)
 # gapminder is already in a tidy data format. If not, we need to render the data into a tidy (i.e., long) format.
 ```
 

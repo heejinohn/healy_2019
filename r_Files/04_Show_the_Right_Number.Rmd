@@ -1,0 +1,29 @@
+# Chapter 4 Show the Right Number
+## Grouping & Faceting
+```{r}
+library(tidyverse)
+library(gapminder)
+
+p <- ggplot(data = gapminder, aes(x = year, y = gdpPercap))
+# group
+p + geom_line(aes(group = country))
+# facet
+p + geom_line(aes(group = country)) + facet_wrap(~continent)
+# clean up
+p + geom_line(aes(group = country), color = "grey70") +
+    geom_smooth(size = 1.1, method = "loess", se = FALSE) +
+    facet_wrap(~continent, ncol = 5) +
+    scale_y_log10(labels = scales::dollar) +
+    labs(x = 'Year', y = 'GDP per capita', title = 'GDP per capita on Five Continents')
+ggsave("figures/Ch04_gdp_by_year_continent.pdf")    
+
+```
+## Facet Grid
+```{r facet_grid}
+library(socviz)
+glimpse(gss_sm)
+p <- ggplot(gss_sm, aes(x = age, y = childs))
+p + geom_point(alpha = 0.7) +
+    facet_grid(sex ~ race) + 
+    geom_smooth()
+```
