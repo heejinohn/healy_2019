@@ -20,6 +20,7 @@ ggsave("figures/Ch04_gdp_by_year_continent.pdf")
 ```
 ## Facet Grid
 ```{r facet_grid}
+library(tidyverse)
 library(socviz)
 glimpse(gss_sm)
 p <- ggplot(gss_sm, aes(x = age, y = childs))
@@ -28,3 +29,18 @@ p + geom_point(alpha = 0.7) +
     geom_smooth()
 ggsave('figures/Ch04_childs_vs_age.pdf')
 ```
+## Transform
+```{r transform}
+library(tidyverse)
+library(socviz)
+p <- ggplot(data = gss_sm, mapping = aes(x = bigregion))
+p + geom_bar(mapping = aes(y = ..prop.., group = 1)) 
+# The geom_ function does a lot of work in the background.
+
+table(gss_sm$religion)
+p  <- ggplot(gss_sm, mapping = aes(x = religion))
+p + geom_bar(position = "dodge",
+             mapping = aes(y = ..prop.., group = bigregion)) +
+    facet_wrap(~bigregion, nrow = 1)
+```
+Using ggplot directly to plot frequency plots can easily turn into a maze. The ``dplyr`` in tidyverse lets you transfrom the data before plotting, which is more error-proof. 
