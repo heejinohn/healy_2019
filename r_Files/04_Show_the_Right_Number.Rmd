@@ -76,3 +76,25 @@ p + geom_density(alpha = 0.3, mapping = (aes(y = ..scaled..)))
 ```
 ## Avoid Transformation When Necessary
 What if I have a finished table with summary statistics already included or a grouped data without individual observations?
+```{r}
+library(socviz)
+
+titanic
+p  <- ggplot(titanic, aes(x = fate, y = percent, fill = sex))
+p + geom_bar(position = "dodge", stat = "identity") + theme(legend.position = "top") + labs(x = "Fate", y = "Percent", fill = "Sex")
+
+oecd_sum       
+p  <- ggplot(data = oecd_sum, mapping = aes(x = year, y = diff, fill = hi_lo))
+p + geom_col() + guides(fill = FALSE) + 
+    labs(x = NULL, y = "Difference in Years", title = "The US Life Expectancy Gap", 
+        subtitle = "Difference between US and OECD average life expectancies, 1960-2015", 
+        caption = "Data: OECD. After a chart by Christopher Ingraham, Wahsington Post, December 27th 2017.")
+ggsave('figures/04_US_vs_OECD_life.pdf', width = 6.5, height = 4, unit = 'in')
+```
+##Recap
+* Map variables to aesthetics.
+* Choose from variety of geoms.
+* Adjust scales of plots.
+* Selecct the right statistic.
+* Facet plots by one or more variables.
+
