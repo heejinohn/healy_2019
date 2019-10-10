@@ -26,4 +26,5 @@ p <- ggplot(gss_sm, aes(x = age, y = childs))
 p + geom_point(alpha = 0.7) +
     facet_grid(sex ~ race) + 
     geom_smooth()
+ggsave('figures/Ch04_childs_vs_age.pdf')
 ```
