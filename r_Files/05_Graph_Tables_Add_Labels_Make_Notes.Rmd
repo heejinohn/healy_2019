@@ -1,0 +1,168 @@
+# Chapter 5 Graph Tables, Add Labels, Make Notes
+This chapter starts diving into `dplyr`. Active verbs select, group, summarize, and transform data prior to `ggplot` plotting.
+
+## Use Pipes to Summarize Data 
+```{r pipeline}
+library(socviz)
+library(tidyverse)
+
+rel_by_region  <- gss_sm %>%
+    group_by(bigregion, religion) %>%
+    summarize(N = n()) %>%
+    mutate(freq = N / sum(N),
+           pct = round((freq * 100), 0))
+    
+rel_by_region
+
+p <- ggplot(rel_by_region, aes(x = bigregion, y = pct, fill = religion))
+p + geom_col(position = "dodge2") +
+    labs(x = "Region", y = "Percent", fill = "Religion") +
+    theme(legend.position = "top")
+```
+This chart, however, is not a good chart. It is too crowded with too many bars stacked side-by-side.Facets increase legibility of `geom_col`. 
+
+```{r geom_col with facet}
+library(socviz)
+library(tidyverse)
+
+rel_by_region  <- gss_sm %>%
+    group_by(bigregion, religion) %>%
+    summarize(N = n()) %>%
+    mutate(freq = N / sum(N),
+           pct = round((freq * 100), 0))
+    
+rel_by_region
+
+p <- ggplot(rel_by_region, aes(x = religion, y = pct, fill = religion))
+p + geom_col(position = "dodge2") +
+    labs(x = NULL, y = "Percent", fill = "Religion") +
+    guides(fill = FALSE) +
+    coord_flip() +
+    facet_grid(~bigregion)
+```
+## Continuous Variables by Group or Category
+Putting categorical variables on the y-axis using `coord\_flip` is a good way to save space when showing continuous variables.
+
+```{r}
+library(socviz)
+library(tidyverse)
+organdata %>% select(1:6) %>% sample_n(size = 10)
+
+p <- ggplot(data = organdata, mapping = aes(x = reorder(country, donors, na.rm = TRUE), y = donors, color = world))
+p + geom_boxplot() + coord_flip() + labs(x = NULL) + theme(legend.position = "top")
+p + geom_jitter(position = position_jitter(width = 0.15)) +
+    labs(x = NULL) + coord_flip() + theme(legend.position = "top")
+```
+
+`dplyr` can be used to construct summary tables
+```{r summary by country}
+by_country  <- organdata %>% group_by(consent_law, country) %>%
+    summarize(donors_mean = mean(donors, na.rm = TRUE),
+              donors_sd = sd(donors, na.rm = TRUE), 
+              gdp_mean = mean(gdp, na.rm = TRUE), 
+              health_mean = mean(health, na.rm = TRUE), 
+              roads_mean = mean(roads, na.rm = TRUE), 
+              cerebvas_mean = mean(cerebvas, na.rm = TRUE))
+
+by_country  <- organdata %>% group_by(consent_law, country) %>%
+    summarize_if(is.numeric, funs(mean, sd), na.rm = TRUE) %>%
+    ungroup()
+
+p  <- ggplot(data = by_country,
+             mapping = aes(x = donors_mean, y = reorder(country, donors_mean),
+             color = consent_law))
+p + geom_point(size = 3) +
+    labs(x = "Donor Procurement Rate", 
+    y = "", color = "Consent Law") + 
+    theme(legend.position = "top")
+
+
+# Cleveland-style dotplot
+p  <- ggplot(data = by_country,
+             mapping = aes(x = donors_mean, y = reorder(country, donors_mean)))
+p + geom_point(size = 3) +
+    labs(x = "Donor Procurement Rate", y = "") + 
+    facet_wrap(~ consent_law, scales = "free_y", ncol = 1)
+```
+without `free_y` each face will repeat all the countries. This is suitable for continuous variables but not for categorical variables.
+
+```{r Cleveland-style dotplot}
+p  <- ggplot(data = by_country,
+             mapping = aes(y = donors_mean, x = reorder(country, donors_mean)))
+p + geom_pointrange(mapping = aes(ymin = donors_mean - donors_sd,
+                                  ymax = donors_mean + donors_sd)) +
+    labs(x = "Donor Procurement Rate", y = "") + 
+    coord_flip()
+```
+The `geom_pointrange` can include information about variance or error in the plot.
+```{r Plot text labels with horizontal adjustment}
+p <- ggplot(data = by_country,
+            mapping = aes(x = roads_mean, y = donors_mean))
+
+p + geom_point() + geom_text(mapping = aes(label = country), hjust = 0)
+```
+Fine tuning `hjust` often fails to provide optimal results because the added space will be proportionate to the label. Instead, we can use `ggrepel`.
+```{r Use of ggrepel }
+library(socviz)
+library(ggrepel)
+elections_historic %>% select(2:7)
+p_title  <- "Presidential Elections: Popular & Electoral College Margins"
+p_subtitle  <- "1824-2016"
+p_caption  <- "Data for 2016 are provisional."
+x_label <- "Winner's share of Popular Vote"
+y_label <- "Winner's share of Electoral College Votes"
+
+p <- ggplot(elections_historic, aes(x = popular_pct, y = ec_pct, label = winner_label))
+
+p + geom_hline(yintercept = 0.5, size = 1.4, color = "gray80") + 
+    geom_vline(xintercept = 0.5, size = 1.4, color = "gray80") +
+    geom_point() +
+    geom_text_repel() +
+    scale_x_continuous(labels = scales::percent) + 
+    scale_y_continuous(labels = scales::percent) + 
+    labs(x = x_label, y = y_label, title = p_title, subtitle = p_subtitle, caption = p_caption) 
+```
+In addition to `geom_hline` and `geom_vline`, `geom_abline` can be used to draw guidlines when a guideline with an intercept and a slope is needed.
+
+```{r Labeling according to criteria}
+p <- ggplot(data = by_country,
+            mapping = aes(x = gdp_mean, y = health_mean))
+
+p + geom_point() +
+    geom_text_repel(data = subset(by_country, gdp_mean > 25000),
+                    mapping = aes(label = country))
+
+p + geom_point() +
+    geom_text_repel(data = subset(by_country,
+                                  gdp_mean > 25000 | health_mean < 1500 | country %in% "Belgium"),
+                    mapping = aes(label = country))
+```
+A dummy variable can be dedicated for labeling.
+```{r Labeling using dummy variables}
+organdata$ind  <- organdata$ccode %in% c("Ita", "Spa") & organdata$year > 1998
+p <- ggplot(data = organdata,
+            mapping = aes(x = roads,
+                          y = donors, color = ind))
+
+p + geom_point() + 
+    geom_text_repel(data = subset(organdata, ind),
+                    mapping = aes(label = ccode)) +
+    guides(label = FALSE, color = FALSE)
+```
+## Write and Draw in the Plot Area
+`annotate()` allows to comment or draw directly on the plot area.
+```{r}
+p <- ggplot(data = organdata, mapping = aes(x = roads, y = donors))
+p + geom_point() + annotate(geom = "text", x = 99, y = 33,
+                            label = "A surprisingly high \nrecovery rate", hjust = 0)
+p + geom_point() +
+    annotate(geom = "text", x = 156, y = 33,
+                            label = "A surprisingly high \nrecovery rate", hjust = 0) +
+    annotate(geom = "rect", xmin = 125, xmax = 155, ymin = 30, ymax = 35, fill = "red", alpha = 0.2)
+```
+## Understanding Scales, Guides, and Themes
+```{r}
+p <- ggplot(data = organdata, mapping = aes(x = roads, y = donors, color = world))
+p + geom_point()
+```
+Scales and guides are closely related. 
